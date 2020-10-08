@@ -23,7 +23,24 @@ def show_40_distinct_people(images, unique_ids):
 
     plt.show()
 
-show_40_distinct_people(data, np.unique(target))
+def show_10_faces_of_n_subject(images, subject_ids):
+    cols = 10
+    rows = (len(subject_ids)*10)/cols
+    rows = int(rows)
+
+    fig, axarr = plt.subplots(nrows=rows, ncols=cols, figsize=(18, 9))
+
+    for i, subject_id in enumerate(subject_ids):
+        for j in range(cols):
+            image_index = subject_id*10 + j
+            axarr[i, j].imshow(images[image_index], cmap="gray")
+            axarr[i, j].set_xticks([])
+            axarr[i, j].set_yticks([])
+            axarr[i, j].set_title("face id:{}".format(subject_id))
+    
+    plt.show()
+
+show_10_faces_of_n_subject(images=data, subject_ids=[0, 5, 21, 24, 36])
 # divide data into training, validation and testing (shuffle)
 
 # use PCA for diensionality reduction - reconstruct images using a subset of features
