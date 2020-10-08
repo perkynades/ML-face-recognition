@@ -1,23 +1,29 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.datasets.olivetti_faces import fetch_olivetti_faces
+
+import warnings
+warnings.filterwarnings('ignore')
+print("Warnings ignored!")
 
 # Fetch data and have a look
-faces = fetch_olivetti_faces()
-x, y = faces['data'], faces['target']
-print(f'Data shape: {x.shape}')
-print(f'Label shape: {y.shape}')
-# (400, 4096)
-# (400,)
+data = np.load("src/olivetti_faces.npy")
+target = np.load("src/olivetti_faces_target.npy")
 
-# create a grid of 3x3 images
-for i in range(0, 9):
-  plt.subplot(330 + 1 + i)
-  plt.imshow(x[i].reshape(64, 64))
+def show_40_distinct_people(images, unique_ids):
+    fig, axarr = plt.subplots(nrows=4, ncols=10, figsize=(18, 9))
+    axarr = axarr.flatten()
 
-# show the plot
-plt.show()
+    for unique_id in unique_ids:
+        image_index = unique_id*10
+        axarr[unique_id].imshow(images[image_index], cmap='gray')
+        axarr[unique_id].set_xticks([])
+        axarr[unique_id].set_yticks([])
+        axarr[unique_id].set_title("face id:{}".format(unique_id))
+    plt.suptitle("There are 40 distinct people in the dataset")
 
+    plt.show()
+
+show_40_distinct_people(data, np.unique(target))
 # divide data into training, validation and testing (shuffle)
 
 # use PCA for diensionality reduction - reconstruct images using a subset of features
