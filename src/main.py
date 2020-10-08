@@ -1,5 +1,8 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -40,8 +43,17 @@ def show_10_faces_of_n_subject(images, subject_ids):
     
     plt.show()
 
-show_10_faces_of_n_subject(images=data, subject_ids=[0, 5, 21, 24, 36])
 # divide data into training, validation and testing (shuffle)
+X = data.reshape((data.shape[0], data.shape[1]*data.shape[2]))
+print("X shape:", X.shape)
+
+X_train, X_test, y_train, y_test = train_test_split(X, target, test_size=0.3, stratify=target, random_state=0)
+print("X_train shape:", X_train.shape)
+print("y_train shape:{}".format(y_train.shape))
+
+y_frame=pd.DataFrame()
+y_frame['subject ids']=y_train
+y_frame.groupby(['subject ids']).size().plot.bar(figsize=(15,8),title="Number of Samples for Each Classes")
 
 # use PCA for diensionality reduction - reconstruct images using a subset of features
 
