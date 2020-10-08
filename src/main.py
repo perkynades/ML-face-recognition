@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -56,6 +57,24 @@ y_frame['subject ids']=y_train
 y_frame.groupby(['subject ids']).size().plot.bar(figsize=(15,8),title="Number of Samples for Each Classes")
 
 # use PCA for diensionality reduction - reconstruct images using a subset of features
+pca = PCA(n_components=2)
+pca.fit(X)
+X_pca = pca.transform(X)
+
+number_of_people = 10
+index_range = number_of_people*10
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(1, 1, 1)
+scatter = ax.scatter(X_pca[:index_range, 0],
+                    X_pca[:index_range, 1],
+                    c = target[:index_range],
+                    s = 10,
+                    cmap= plt.get_cmap('jet', number_of_people))
+ax.set_xlabel("First principle component")
+ax.set_ylabel("Second principle component")
+ax.set_title("PCA projection of {} peope".format(number_of_people))
+fig.colorbar(scatter)
+plt.show()
 
 # use autoencoder - reconstruct using a compressed representation (code)
 
