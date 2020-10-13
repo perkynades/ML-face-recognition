@@ -23,3 +23,12 @@ x, y = faces['data'], faces['target']
 
 # Divide data into training, validation and testing (shuffle)
 x_train, x_test, y_train, y_test = train_test_split(x, y, stratify=y, test_size=0.2, random_state=42)
+
+# PCA for densionality reduction - reconstruct images using a subset of features
+pca = PCA(n_components=8*8)
+pca.fit(x)
+cumsum = np.cumsum(pca.explained_variance_ratio_)
+
+x_reduced = pca.fit_transform(x_test)
+x_recovered = pca.inverse_transform(x_reduced)
+
