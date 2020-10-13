@@ -32,3 +32,19 @@ cumsum = np.cumsum(pca.explained_variance_ratio_)
 x_reduced = pca.fit_transform(x_test)
 x_recovered = pca.inverse_transform(x_reduced)
 
+# Use autoencoder - reconstruct using a compressed representation (code)
+# Call neural network API: sequential model is a linear stack of layers
+autoencoder = Sequential()
+autoencoder.add(Dense(units=1024, activation='relu', input_dim=64*64, name='encoder_layer1'))
+autoencoder.add(Dense(units=512, activation='relu', input_dim=1024, name='encoder_layer2'))
+autoencoder.add(Dense(units=64, activation='relu', input_dim=512, name='encoder_layer3'))
+
+autoencoder.add(Dense(units=512, activation='relu', name='decoder_layer1'))
+autoencoder.add(Dense(units=1024, activation='relu', name='decoder_layer2'))
+autoencoder.add(Dense(units=64*64, activation='sigmoid', name='decoder_layer3'))
+
+autoencoder.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
+
+autoencoder.summary()
+
+history = autoencoder.fit(x = x_train, y = x_train, epochs=10, batch_size=32, shuffle=True, validation_data=(x_train, x_train), verbose=1)
