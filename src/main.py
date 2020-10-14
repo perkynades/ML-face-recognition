@@ -48,3 +48,48 @@ autoencoder.compile(optimizer='adam', loss='mean_squared_error', metrics=['accur
 autoencoder.summary()
 
 history = autoencoder.fit(x = x_train, y = x_train, epochs=10, batch_size=32, shuffle=True, validation_data=(x_train, x_train), verbose=1)
+
+# Plot accuracy and loss
+# Test trained autoencoder
+encoder = Model(inputs = autoencoder.input, outputs = autoencoder.layers[2].output)
+encoded_imgs = encoder.predict(x_test)
+
+print(encoded_imgs.shape)
+
+# Retrieve the last layer of the autoencoder model
+
+encoded_input = Input(shape=(64,))
+decoder_layer = autoencoder.layers[3](encoded_input)
+decoder_layer = autoencoder.layers[4](decoder_layer)
+decoder_layer = autoencoder.layers[5](decoder_layer)
+
+decoder = Model(inputs = encoded_input, outputs = decoder_layer)
+
+decoded_imgs = decoder.predict(encoded_imgs)
+
+print(encoded_imgs.shape)
+
+predicted_imgs = autoencoder.predict(x_test, verbose=1)
+
+n = 10  
+plt.figure(figsize=(20, 4))
+for i in range(n):
+    # Display original
+    ax = plt.subplot(3, n, i + 1)
+    plt.imshow(x_test[i].reshape(64, 64))
+    plt.gray()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+    # Display encoded images
+    ax = plt.subplot(3, n, i + 1 + n)
+    plt.imshow(encoded_imgs[i].reshape(8, 8))
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+
+    # Display reconstruction
+    ax = plt.subplot(3, n, i + 1 + 2*n)
+    plt.imshow(decoded_imgs[i].reshape(64, 64))
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+plt.show()
