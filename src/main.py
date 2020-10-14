@@ -4,6 +4,7 @@ print("Warnings ignored!!")
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 from matplotlib.colors import ListedColormap
 from sklearn.datasets.olivetti_faces import fetch_olivetti_faces
 from keras.utils import to_categorical
@@ -131,3 +132,29 @@ def plot_cm(ytest, ypred, title):
 
 plot_cm(y_train, kmeans.predict(encoder.predict(x_train)), title='Train')
 plot_cm(y_test, kmeans.predict(encoder.predict(x_test)), title='Test')
+
+# Supervised algorithm
+print(y.shape)
+print(y_train[0])
+print(y_train.shape)
+
+y_train_cat = to_categorical(y_train)
+y_test_cat = to_categorical(y_test)
+print(y_train_cat[0])
+
+model = Sequential()
+model.add(Dense(56, activation='relu', input_shape=(8*8,), name='hidden_layer'))
+model.add(Dense(40, activation='softmax', name='output_layer'))
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+
+model.summary()
+plot_model(model, to_file='mnist_keras.png', show_shapes=True, show_layer_names=True)
+
+enc_train = encoder.predict(x_train).reshape(320, 8*8)
+enc_test = encoder.predict(x_test).reshape(80, 8*8)
+print(enc_train.shape)
+print(enc_test.shape)
+
+history = model.fit(enc_train, y_train_cat, epochs=50, batch_size=32)
+test_loss, test_accu = model.evaluate(enc_test, y_test_cat)
+print(test_loss, test_accu)
