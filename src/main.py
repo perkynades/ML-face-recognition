@@ -47,7 +47,7 @@ autoencoder.compile(optimizer='adam', loss='mean_squared_error', metrics=['accur
 
 autoencoder.summary()
 
-history = autoencoder.fit(x = x_train, y = x_train, epochs=10, batch_size=32, shuffle=True, validation_data=(x_train, x_train), verbose=1)
+history = autoencoder.fit(x = x_train, y = x_train, epochs=50, batch_size=32, shuffle=True, validation_data=(x_train, x_train), verbose=1)
 
 # Plot accuracy and loss
 # Test trained autoencoder
@@ -93,3 +93,41 @@ for i in range(n):
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 plt.show()
+
+# Unsupervised algorithm
+# Create KMC classifier
+kmeans = KMeans(n_clusters=40, max_iter=10000, algorithm='auto', random_state=7, verbose=1)
+
+# Train the model using the training sets
+encoded_imgs = encoder.predict(x_train)
+kmeans.fit(encoded_imgs)
+
+# Predict the response for test dataset
+encoded_imgs = encoder.predict(x_test)
+y_pred = kmeans.predict(encoded_imgs)
+print(y_pred[0,])
+print(y_test[0,])
+
+# Model accuracy, how often is the classifier correct?
+print("Accuracy:", accuracy_score(y_test, y_pred))
+
+cmap = ListedColormap(['lightgrey', 'silver', 'ghostwhite', 'lavender', 'wheat'])
+plt.rcParams["figure.figsize"] = (8, 8)
+
+# Confusion matrix
+def plot_cm(ytest, ypred, title):
+    cm = confusion_matrix(ytest, ypred)
+
+    plt.matshow(cm, cmap=cmap)
+
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            plt.text(x=j, y=i, s=cm[i,j], va='center', ha='center')
+
+    plt.title(title)
+    plt.xlabel('Predicted label')
+    plt.ylabel('True label')
+    plt.show()
+
+plot_cm(y_train, kmeans.predict(encoder.predict(x_train)), title='Train')
+plot_cm(y_test, kmeans.predict(encoder.predict(x_test)), title='Test')
