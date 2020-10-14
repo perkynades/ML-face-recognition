@@ -48,7 +48,7 @@ autoencoder.compile(optimizer='adam', loss='mean_squared_error', metrics=['accur
 
 autoencoder.summary()
 
-history = autoencoder.fit(x = x_train, y = x_train, epochs=50, batch_size=32, shuffle=True, validation_data=(x_train, x_train), verbose=1)
+history = autoencoder.fit(x = x_train, y = x_train, epochs=200, batch_size=32, shuffle=True, validation_data=(x_train, x_train), verbose=1)
 
 # Plot accuracy and loss
 # Test trained autoencoder
@@ -93,7 +93,7 @@ for i in range(n):
     plt.imshow(decoded_imgs[i].reshape(64, 64))
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
-plt.show()
+plt.show(block=False)
 
 # Unsupervised algorithm
 # Create KMC classifier
@@ -128,7 +128,7 @@ def plot_cm(ytest, ypred, title):
     plt.title(title)
     plt.xlabel('Predicted label')
     plt.ylabel('True label')
-    plt.show()
+    plt.show(block=False)
 
 plot_cm(y_train, kmeans.predict(encoder.predict(x_train)), title='Train')
 plot_cm(y_test, kmeans.predict(encoder.predict(x_test)), title='Test')
@@ -155,6 +155,26 @@ enc_test = encoder.predict(x_test).reshape(80, 8*8)
 print(enc_train.shape)
 print(enc_test.shape)
 
-history = model.fit(enc_train, y_train_cat, epochs=50, batch_size=32)
+history = model.fit(enc_train, y_train_cat, epochs=500, batch_size=32)
 test_loss, test_accu = model.evaluate(enc_test, y_test_cat)
 print(test_loss, test_accu)
+
+# Confusion matrix
+y_pred_train = model.predict(enc_train)
+y_pred_train = np.argmax(y_pred_train, axis=-1)
+plot_cm(y_train, y_pred_train, title='Train')
+
+y_pred_test = model.predict(enc_test)
+y_pred_test = np.argmax(y_pred_test, axis=-1)
+print(y_pred_test.shape)
+print(y_test.shape)
+
+print(np.unique(y_pred_test))
+print(np.unique(y_test))
+
+print('Precision score:', precision_score(y_test, y_pred_test, average='macro'))
+print('Recall score   :', recall_score(y_test, y_pred_test, average='macro'))
+
+plot_cm(y_test[1:], y_pred_test[1:], title='Test')
+
+plt.show()
